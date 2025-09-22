@@ -1,0 +1,1 @@
+This is a CLI tool to calculate capital gains on stock trades from Robinhood and Fidelity.
