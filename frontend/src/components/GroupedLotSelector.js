@@ -57,17 +57,18 @@ function computeTickerSummary(lots = [], currentPrice) {
   return { totalQty, netPL: netPL ?? 0, gainsOnly, lossesOnly };
 }
 
-function GroupedLotSelector({
-  lots,
-  prices,
-  selectedLotIds,
-  onToggleLot,
-  onToggleLongTerm, // (ticker, longTermLots, allLongTermSelected, allLots) => void
-}) {
+function GroupedLotSelector({ lots, prices, selectedLotIds, onToggleLot, onToggleLongTerm }) {
   const asOf = new Date();
   const rootRef = useRef(null);
 
-  const grouped = useMemo(() => groupLotsByTicker(lots || []), [lots]);
+  // Drop zero-qty lots up front
+  const nonZeroLots = useMemo(
+    () => (lots || []).filter(l => Number(l?.qty) > 0),
+    [lots]
+  );
+
+  const grouped = useMemo(() => groupLotsByTicker(nonZeroLots), [nonZeroLots]);
+
 
   const expandAll = () => {
     const root = rootRef.current;
