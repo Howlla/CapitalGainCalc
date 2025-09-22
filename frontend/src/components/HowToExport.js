@@ -3,17 +3,17 @@ import React from 'react';
 const steps = [
   {
     title: 'Open Account',
-    caption: 'Tap the Account tab (person icon) in Robinhood on iPhone.',
+    caption: 'Tap the Account tab (person icon) in the Robinhood app.',
     img: '/images/iphone-export-1.png',
   },
   {
-    title: 'Statements & History',
-    caption: 'Open Statements & History (or Activity → History).',
+    title: 'Reports & Statements',
+    caption: 'Open Reports & Statements.',
     img: '/images/iphone-export-2.png',
   },
   {
     title: 'Export CSV',
-    caption: 'Choose Export/Download CSV. Select your desired date range.',
+    caption: 'Choose Export/Download CSV. Select entire date range (required).',
     img: '/images/iphone-export-3.png',
   },
   {

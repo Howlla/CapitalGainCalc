@@ -58,7 +58,7 @@ function LandingPage() {
         <div className="container">
           <h2>Export your Robinhood data</h2>
           <p className="howto-intro">
-            Follow these steps on your iPhone, then upload the CSV below.
+            Follow these steps on your phone, then upload the CSV below.
           </p>
           <HowToExport />
         </div>

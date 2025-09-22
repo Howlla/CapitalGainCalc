@@ -36,7 +36,7 @@ function CapitalGainsSummary({
         </p>
       )}
 
-      <div style={{ marginTop: 8 }}>
+      {/* <div style={{ marginTop: 8 }}>
         <label>
           <input
             type="checkbox"
@@ -45,7 +45,7 @@ function CapitalGainsSummary({
           />
           {' '}Show past years capital gains
         </label>
-      </div>
+      </div> */}
 
       {showPastYears && (
         <p style={{ marginTop: 8 }}>
