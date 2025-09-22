@@ -2,8 +2,9 @@ from flask import Flask, request, jsonify
 from csv_parser import parse_robinhood_csv
 from capital_gains_calculator import calculate_capital_gains
 import os
-import requests
 from dotenv import load_dotenv
+import yfinance as yf
+import pandas as pd
 
 load_dotenv()
 
@@ -22,31 +23,78 @@ def upload_file():
         file.save(file_path)
 
         trades = parse_robinhood_csv(file_path)
-        capital_gains = calculate_capital_gains(trades)
+        result = calculate_capital_gains(trades)
 
         os.remove(file_path)
 
-        return jsonify(capital_gains)
+        # result includes: { gains, summary, unsold_lots, remaining_tickers }
+        return jsonify(result)
 
 @app.route('/api/get_price', methods=['GET'])
 def get_price():
-    tickers = request.args.get('tickers')
-    if not tickers:
+    """
+    Returns a flat map of ticker -> price using a single yfinance download call.
+    Example: { "AAPL": 190.12, "MSFT": 413.88 }
+    """
+    tickers_param = request.args.get('tickers')
+    if not tickers_param:
         return jsonify({'error': 'Ticker symbols are required'}), 400
 
-    api_key = os.getenv('FMP_API_KEY')
-    url = f'https://financialmodelingprep.com/stable/batch-quote?symbols={tickers}&apikey={api_key}'
+    # Normalize symbols
+    symbols = [s.strip().upper() for s in tickers_param.split(',') if s.strip()]
+    if not symbols:
+        return jsonify({'error': 'No valid ticker symbols provided'}), 400
 
     try:
-        response = requests.get(url)
-        data = response.json()
-        if not isinstance(data, list):
-            error_message = data.get("Error Message", "An unknown error occurred with the FMP API.")
-            return jsonify({'error': error_message}), 500
-        prices = {item['symbol']: item['price'] for item in data}
-        return jsonify(prices)
+        # Single call to yf.download for all symbols
+        df = yf.download(
+            tickers=" ".join(symbols),
+            period="1d",            # last trading day prices
+            interval="1d",
+            auto_adjust=False,
+            progress=False,
+            threads=True            # let yfinance manage concurrency internally
+        )
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': f'yfinance error: {str(e)}'}), 502
+
+    prices = {}
+
+    if isinstance(df.columns, pd.MultiIndex):
+        # Multiple tickers: columns like ('Close','AAPL'), ('Adj Close','AAPL'), ...
+        for sym in symbols:
+            price = None
+            if ('Close', sym) in df.columns:
+                series = df[('Close', sym)].dropna()
+                if not series.empty:
+                    price = float(series.iloc[-1])
+            if price is None and ('Adj Close', sym) in df.columns:
+                series = df[('Adj Close', sym)].dropna()
+                if not series.empty:
+                    price = float(series.iloc[-1])
+            if price is not None:
+                prices[sym] = price
+    else:
+        # Single ticker: columns like 'Close', 'Adj Close'
+        # yfinance sometimes returns lowercase/space variants; normalize keys
+        cols = {str(c).lower(): c for c in df.columns}
+        sym = symbols[0]
+        price = None
+        if 'close' in cols:
+            series = df[cols['close']].dropna()
+            if not series.empty:
+                price = float(series.iloc[-1])
+        if price is None and 'adj close' in cols:
+            series = df[cols['adj close']].dropna()
+            if not series.empty:
+                price = float(series.iloc[-1])
+        if price is not None:
+            prices[sym] = price
+
+    if not prices:
+        return jsonify({'error': 'Unable to fetch prices for provided tickers'}), 502
+
+    return jsonify(prices)
 
 if __name__ == '__main__':
     app.run(debug=True)
