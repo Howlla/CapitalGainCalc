@@ -5,6 +5,7 @@ import GroupedLotSelector from '../components/GroupedLotSelector';
 import CapitalGainsDisplay from '../components/CapitalGainsDisplay';
 import HowToSellLots from '../components/HowToSellLots';
 
+
 function ResultsPage() {
   const location = useLocation();
   const navigate = useNavigate();

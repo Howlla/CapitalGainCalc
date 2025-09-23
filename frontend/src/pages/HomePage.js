@@ -2,6 +2,8 @@ import React from 'react';
 import LandingPage from '../components/LandingPage';
 import FileUpload from '../components/FileUpload';
 import FAQ from '../components/FAQ';
+import NewsletterSignup from '../components/NewsletterSignup';
+
 
 function HomePage() {
   return (
@@ -19,6 +21,7 @@ function HomePage() {
         </div>
       </section>
       <FAQ />
+     <NewsletterSignup/>
       <footer className="site-footer">
         <div className="container">
           <div className="footer-inner">
