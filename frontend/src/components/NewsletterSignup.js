@@ -6,7 +6,7 @@ export default function NewsletterSignup() {
   return (
     <section id="newsletter" className="newsletter" aria-labelledby="newsletter-heading">
       <div className="newsletter__container">
-        <h2 id="newsletter-heading">Be first in line — early access</h2>
+        <h2 id="newsletter-heading">Get notified of the latest feature updates</h2>
         <p className="newsletter__subtitle">
           Join the list for early access, feature previews, and tax savings tips. No spam.
         </p>
@@ -28,9 +28,10 @@ export default function NewsletterSignup() {
             placeholder="you@example.com"
             required
             autoComplete="email"
+            style={{ textAlign: 'center' }} // center placeholder (and input text)
           />
           <input type="hidden" value="1" name="embed" />
-          <button type="submit">Get early access</button>
+          <button type="submit">Subscribe</button>
         </form>
 
         <p className="newsletter__fineprint">Unsubscribe anytime.</p>

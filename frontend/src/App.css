@@ -607,3 +607,7 @@ th { background-color: #151b18; }
   overflow: hidden; clip: rect(0, 0, 0, 0);
   white-space: nowrap; border: 0;
 }
+
+/* e.g., in App.css */
+#bd-email { text-align: left; }
+#bd-email::placeholder { text-align: center; }
